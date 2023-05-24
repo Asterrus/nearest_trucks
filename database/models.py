@@ -1,4 +1,4 @@
-from sqlalchemy import CheckConstraint, ForeignKey
+from sqlalchemy import CheckConstraint, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import (Mapped, mapped_column, DeclarativeBase,
                             declared_attr, relationship, validates)
 
@@ -18,14 +18,14 @@ class Location(Base):
     postcode: Mapped[int]
     latitude: Mapped[float]
     longitude: Mapped[float]
-    cargos: Mapped[list['Cargo']] = relationship(back_populates='location')
-    trucks: Mapped[list['Truck']] = relationship(back_populates='location')
 
     __table_args__ = (
         CheckConstraint('latitude >= -90', 'min_latitude_-90_constraint'),
         CheckConstraint('latitude <= 90', 'max_latitude_90_constraint'),
         CheckConstraint('longitude >= -180', 'min_longitude_-180_constraint'),
         CheckConstraint('longitude <= 180', 'max_longitude_180_constraint'),
+        UniqueConstraint('latitude', 'longitude',
+                         name='unique_latitude_longitude_constraint'),
     )
 
     def __repr__(self) -> str:
@@ -35,9 +35,9 @@ class Location(Base):
 
 class Truck(Base):
     capacity: Mapped[int]
-    location: Mapped["Location"] = relationship(back_populates="trucks")
+    location: Mapped["Location"] = relationship()
     location_id: Mapped[int] = mapped_column(ForeignKey('location.id'))
-    VIN: Mapped[str]
+    VIN: Mapped[str] = mapped_column(unique=True)
 
     __table_args__ = (
         CheckConstraint('capacity >= 1', 'min_capacity_1_constraint'),
@@ -59,12 +59,17 @@ class Truck(Base):
 
 
 class Cargo(Base):
-    pick_up_location: Mapped["Location"] = relationship(back_populates="cargos")
-    pick_up_location_id: Mapped[int] = mapped_column(ForeignKey('location.id'))
-    delivery_location: Mapped["Location"] = relationship(back_populates="cargos")
-    delivery_location_id: Mapped[int] = mapped_column(ForeignKey('location.id'))
     weight: Mapped[int] = mapped_column(CheckConstraint('1 <= weight <= 1000'))
     description: Mapped[str]
+    pick_up_location_id: Mapped[int] = mapped_column(ForeignKey('location.id'))
+    delivery_location_id: Mapped[int] = mapped_column(ForeignKey('location.id'))
+    pick_up_location: Mapped["Location"] = relationship(
+        foreign_keys=[pick_up_location_id])
+    delivery_location: Mapped["Location"] = relationship(
+        foreign_keys=[delivery_location_id])
+
+
+
 
     __table_args__ = (
         CheckConstraint('weight >= 1', 'min_weight_1_constraint'),
@@ -75,3 +80,4 @@ class Cargo(Base):
 
     def __repr__(self) -> str:
         return f"Cargo(id={self.id!r}, description={self.description[:20]!r})"
+
