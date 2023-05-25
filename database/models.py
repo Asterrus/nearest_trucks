@@ -15,7 +15,7 @@ class Base(DeclarativeBase):
 class Location(Base):
     city: Mapped[str]
     state: Mapped[str]
-    postcode: Mapped[int]
+    postcode: Mapped[str]
     latitude: Mapped[float]
     longitude: Mapped[float]
 
@@ -48,7 +48,7 @@ class Truck(Base):
     def validate_vin(self, key, value):
         if len(value) != 5:
             raise ValueError('The VIN length should be 5')
-        if 1000 < int(value[:4]) < 9999:
+        if not 1000 <= int(value[:4]) <= 9999:
             raise ValueError('The VIN number should be between 1000 and 9999')
         if not 'A' <= value[-1] <= 'Z':
             raise ValueError('The letter must be a capital English letter')
@@ -62,14 +62,12 @@ class Cargo(Base):
     weight: Mapped[int] = mapped_column(CheckConstraint('1 <= weight <= 1000'))
     description: Mapped[str]
     pick_up_location_id: Mapped[int] = mapped_column(ForeignKey('location.id'))
-    delivery_location_id: Mapped[int] = mapped_column(ForeignKey('location.id'))
+    delivery_location_id: Mapped[int] = mapped_column(
+        ForeignKey('location.id'))
     pick_up_location: Mapped["Location"] = relationship(
         foreign_keys=[pick_up_location_id])
     delivery_location: Mapped["Location"] = relationship(
         foreign_keys=[delivery_location_id])
-
-
-
 
     __table_args__ = (
         CheckConstraint('weight >= 1', 'min_weight_1_constraint'),
@@ -80,4 +78,3 @@ class Cargo(Base):
 
     def __repr__(self) -> str:
         return f"Cargo(id={self.id!r}, description={self.description[:20]!r})"
-
