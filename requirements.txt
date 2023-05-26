@@ -4,3 +4,4 @@ SQLAlchemy==2.0.15
 uvicorn==0.22.0
 fastapi==0.95.2
 geopy==2.3.0
+python-dotenv==1.0.0
