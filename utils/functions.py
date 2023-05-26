@@ -1,17 +1,18 @@
 import asyncio
-import os
 import csv
+import os
 import random
 
 from geopy import distance
-from sqlalchemy import select, func
+from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from config import (DATA_FOLDER, TRUCK_INIT_AMOUNT,
+                    TRUCK_LOCATION_CHANGE_INTERVAL, TRUCK_MAX_CAPACITY,
+                    TRUCK_MIN_CAPACITY, VIN_MIN_NUMBER)
 from database.crud.base import get_all_objects
 from database.models import Location, Truck
-from config import DATA_FOLDER, TRUCK_LOCATION_CHANGE_INTERVAL, \
-    TRUCK_INIT_AMOUNT, TRUCK_MAX_CAPACITY, TRUCK_MIN_CAPACITY, VIN_MIN_NUMBER
 
 
 async def import_locations(session: AsyncSession) -> None:

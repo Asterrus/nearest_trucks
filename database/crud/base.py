@@ -15,8 +15,3 @@ async def get_object_or_404(db: AsyncSession, model, condition):
 async def get_all_objects(db: AsyncSession, model):
     result = await db.scalars(select(model))
     return result.all()
-
-
-
-
-

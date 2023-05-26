@@ -1,17 +1,15 @@
-from fastapi.routing import APIRouter
 from fastapi.concurrency import run_in_threadpool
+from fastapi.routing import APIRouter
 
-from database.crud.base import get_object_or_404
-from database.crud.cargo import create, update, delete
-from database.crud.base import get_all_objects
-from database.models import Cargo as CargoModel, Location, Truck as TruckModel
+from database.crud.base import get_all_objects, get_object_or_404
+from database.crud.cargo import create, delete, update
 from database.db import database
-
-from schemas.cargo import (Cargo, CargoInput, CargoEdit,
-                           CargoDisplaySingle, CargoDisplayMany)
-
+from database.models import Cargo as CargoModel
+from database.models import Location
+from database.models import Truck as TruckModel
+from schemas.cargo import (Cargo, CargoDisplayMany, CargoDisplaySingle,
+                           CargoEdit, CargoInput)
 from schemas.truck import TruckForCargo
-
 from utils.functions import find_distance
 
 cargo_router = APIRouter(

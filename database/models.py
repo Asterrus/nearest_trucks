@@ -1,9 +1,9 @@
 from sqlalchemy import CheckConstraint, ForeignKey, UniqueConstraint
-from sqlalchemy.orm import (Mapped, mapped_column, DeclarativeBase,
-                            declared_attr, relationship, validates)
+from sqlalchemy.orm import (DeclarativeBase, Mapped, declared_attr,
+                            mapped_column, relationship, validates)
 
-from config import CARGO_MIN_WEIGHT, CARGO_MAX_WEIGHT, TRUCK_MIN_CAPACITY, \
-    TRUCK_MAX_CAPACITY
+from config import (CARGO_MAX_WEIGHT, CARGO_MIN_WEIGHT, TRUCK_MAX_CAPACITY,
+                    TRUCK_MIN_CAPACITY)
 from utils.validators import vin_validator
 
 

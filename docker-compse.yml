@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:13.0-alpine
+    restart: always
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "username", '-d', 'default_database']
+      interval: 5s
+      retries: 5
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres:/var/lib/postgresql/data/
+    env_file:
+      - ./.env
+
+  web:
+    build: .
+    command: >
+      sh -c "alembic upgrade head &&
+             uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - web_volume:/web
+    ports:
+      - "8000:8000"
+
+
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=pgadmin4@pgadmin.org
+      - PGADMIN_DEFAULT_PASSWORD=admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - web
+
+volumes:
+  web_volume:
+  postgres:

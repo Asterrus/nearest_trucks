@@ -1,8 +1,10 @@
 from fastapi.routing import APIRouter
-from database.crud.truck import update
+
 from database.crud.base import get_object_or_404
+from database.crud.truck import update
 from database.db import database
-from database.models import Truck as TruckModel, Location
+from database.models import Location
+from database.models import Truck as TruckModel
 from schemas.truck import Truck, TruckEdit
 
 truck_router = APIRouter(
