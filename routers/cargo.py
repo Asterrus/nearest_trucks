@@ -67,9 +67,9 @@ async def get_cargo(db: database, id: int):
 async def add_cargo(db: database, cargo: CargoInput):
     """Adding an instance of cargo. Valid zip codes are required."""
     pick_up_location = await get_object_or_404(
-        db, Location, Location.postcode == cargo.zip_pick_up)
+        db, Location, Location.postcode == cargo.zip_pick_up, 'zip_pick_up')
     delivery_location = await get_object_or_404(
-        db, Location, Location.postcode == cargo.zip_delivery)
+        db, Location, Location.postcode == cargo.zip_delivery, 'zip_delivery')
     return await create(db, pick_up_location, delivery_location,
                         cargo.weight, cargo.description)
 
