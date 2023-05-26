@@ -1,5 +1,8 @@
 from pydantic import BaseModel, Field, validator
 
+from schemas.location import LocationDisplay
+from schemas.truck import TruckForCargo
+
 
 class CargoBase(BaseModel):
     description: str
@@ -24,6 +27,19 @@ class CargoInput(CargoBase):
 class CargoCreate(CargoBase):
     pick_up_location_id: int
     delivery_location_id: int
+
+
+class CargoDisplay(BaseModel):
+    pick_up_location: LocationDisplay
+    delivery_location: LocationDisplay
+
+
+class CargoDisplaySingle(CargoDisplay):
+    trucks: list[TruckForCargo]
+
+
+class CargoDisplayMany(CargoDisplay):
+    nearest_trucks: int
 
 
 class Cargo(CargoBase):

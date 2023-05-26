@@ -2,6 +2,10 @@ from sqlalchemy import CheckConstraint, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import (Mapped, mapped_column, DeclarativeBase,
                             declared_attr, relationship, validates)
 
+from config import CARGO_MIN_WEIGHT, CARGO_MAX_WEIGHT, TRUCK_MIN_CAPACITY, \
+    TRUCK_MAX_CAPACITY
+from utils.validators import vin_validator
+
 
 class Base(DeclarativeBase):
 
@@ -29,49 +33,49 @@ class Location(Base):
     )
 
     def __repr__(self) -> str:
-        return (f"Truck(id={self.id!r},"
+        return (f"Location(id={self.id!r},"
                 f" latitude={self.latitude!r}, longitude={self.longitude!r})")
 
 
 class Truck(Base):
     capacity: Mapped[int]
-    location: Mapped["Location"] = relationship()
-    location_id: Mapped[int] = mapped_column(ForeignKey('location.id'))
+    location: Mapped["Location"] = relationship(lazy="selectin")
+    location_id: Mapped[int] = mapped_column(
+        ForeignKey('location.id'), index=True)
     VIN: Mapped[str] = mapped_column(unique=True)
 
     __table_args__ = (
-        CheckConstraint('capacity >= 1', 'min_capacity_1_constraint'),
-        CheckConstraint('capacity <= 1000', 'max_capacity_1000_constraint'),
+        CheckConstraint(f'capacity >= {TRUCK_MIN_CAPACITY}',
+                        f'min_capacity_{TRUCK_MIN_CAPACITY}_constraint'),
+        CheckConstraint(f'capacity <= {TRUCK_MAX_CAPACITY}',
+                        f'max_capacity_{TRUCK_MAX_CAPACITY}_constraint'),
     )
 
     @validates('VIN')
     def validate_vin(self, key, value):
-        if len(value) != 5:
-            raise ValueError('The VIN length should be 5')
-        if not 1000 <= int(value[:4]) <= 9999:
-            raise ValueError('The VIN number should be between 1000 and 9999')
-        if not 'A' <= value[-1] <= 'Z':
-            raise ValueError('The letter must be a capital English letter')
-        return value
+        return vin_validator(value)
 
     def __repr__(self) -> str:
         return f"Truck(id={self.id!r}, VIN={self.VIN!r})"
 
 
 class Cargo(Base):
-    weight: Mapped[int] = mapped_column(CheckConstraint('1 <= weight <= 1000'))
+    weight: Mapped[int]
     description: Mapped[str]
-    pick_up_location_id: Mapped[int] = mapped_column(ForeignKey('location.id'))
+    pick_up_location_id: Mapped[int] = mapped_column(
+        ForeignKey('location.id'), index=True)
     delivery_location_id: Mapped[int] = mapped_column(
-        ForeignKey('location.id'))
+        ForeignKey('location.id'), index=True)
     pick_up_location: Mapped["Location"] = relationship(
-        foreign_keys=[pick_up_location_id])
+        foreign_keys=[pick_up_location_id], lazy="selectin")
     delivery_location: Mapped["Location"] = relationship(
-        foreign_keys=[delivery_location_id])
+        foreign_keys=[delivery_location_id], lazy="selectin")
 
     __table_args__ = (
-        CheckConstraint('weight >= 1', 'min_weight_1_constraint'),
-        CheckConstraint('weight <= 1000', 'max_weight_1000_constraint'),
+        CheckConstraint(f'weight >= {CARGO_MIN_WEIGHT}',
+                        f'min_weight_{CARGO_MIN_WEIGHT}_constraint'),
+        CheckConstraint(f'weight <= {CARGO_MAX_WEIGHT}',
+                        f'max_weight_{CARGO_MAX_WEIGHT}_constraint'),
         CheckConstraint('pick_up_location_id != delivery_location_id',
                         'different_locations_constraint'),
     )
