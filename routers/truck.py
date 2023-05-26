@@ -18,6 +18,7 @@ async def edit_truck(db: database, truck_data: TruckEdit, id: int):
     """Updating the location of the truck. Valid zip code is required."""
     truck = await get_object_or_404(db, TruckModel, TruckModel.id == id)
     location = await get_object_or_404(db, Location,
-                                       Location.postcode == truck_data.zip)
+                                       Location.postcode == truck_data.zip,
+                                       'zip')
     await update(db, location, truck)
     return truck
