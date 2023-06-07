@@ -1,5 +1,7 @@
-from dotenv import load_dotenv
 import os
+
+from dotenv import load_dotenv
+
 load_dotenv()
 
 DB_HOST = os.environ.get('DB_HOST')
@@ -16,3 +18,10 @@ TRUCK_MAX_CAPACITY = 1000
 VIN_MIN_NUMBER = 1000
 CARGO_MIN_WEIGHT = 1
 CARGO_MAX_WEIGHT = 1000
+
+# Тестовая база данных
+DB_NAME_TEST = os.environ.get('POSTGRES_DB_TEST')
+DB_USER_TEST = os.environ.get('POSTGRES_USER_TEST')
+DB_PASS_TEST = os.environ.get('POSTGRES_PASSWORD_TEST')
+DB_HOST_TEST = os.environ.get('DB_HOST_TEST')
+DB_PORT_TEST = os.environ.get('DB_PORT_TEST')
