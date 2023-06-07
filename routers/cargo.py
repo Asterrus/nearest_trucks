@@ -2,8 +2,6 @@ from fastapi import status
 from fastapi.concurrency import run_in_threadpool
 from fastapi.routing import APIRouter
 
-from config import (DB_HOST_TEST, DB_NAME_TEST, DB_PASS_TEST, DB_PORT_TEST,
-                    DB_USER_TEST)
 from database.crud.base import get_all_objects, get_object_or_404
 from database.crud.cargo import create, delete, update
 from database.db import database
@@ -45,7 +43,6 @@ async def get_all_cargoes(db: database, max_distance: int | None = 450,
             pick_up_location=cargo.pick_up_location,
             delivery_location=cargo.delivery_location,
             nearest_trucks=nearest_tracks))
-    print(DB_PORT_TEST, DB_HOST_TEST, DB_PASS_TEST, DB_USER_TEST, DB_NAME_TEST)
     return cargoes_list
 
 
