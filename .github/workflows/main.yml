@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  # Срабатывает при пуше или пулл реквесте в ветку main.
+  push:
+    branches:    
+      - main
+  pull_request:
+    branches:    
+      - main
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+
+  tests:
+    runs-on: ubuntu-22.04
+
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 1111:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        # Запуск actions setup-python — готового скрипта 
+        # для развёртывания окружения Python
+        uses: actions/setup-python@v4
+        with:
+          # Выбор версии Python
+          python-version: '3.11.1'
+
+      - name: Install dependencies
+        run: | 
+          # обновление pip
+          python -m pip install --upgrade pip 
+          # установка flake8 и его плагинов
+          pip install flake8 pep8-naming flake8-broken-line flake8-return flake8-isort
+          # установка зависимостей
+          pip install -r requirements.txt 
+
+      - name: Test with flake8
+        run: |
+          # запуск проверки проекта по flake8
+          python -m flake8
+      - name: Test with pytest
+        run: |
+          # запуск тестов pytest
+          pytest
+        env:
+          POSTGRES_DB_TEST: "postgres"
+          POSTGRES_USER_TEST: "postgres"
+          POSTGRES_PASSWORD_TEST: "postgres"
+          DB_HOST_TEST: "localhost"
+          DB_PORT_TEST: "1111"
