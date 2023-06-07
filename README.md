@@ -71,6 +71,7 @@
    База данных - PostgreSQL  
    ORM - SQLAlchemy, миграции - Alembic  
    Проект разворачивается с помощью docker compose  
+   При пулл реквесте или пуше в ветку main запускаются тесты.  
    Python версии 3.11.1  
  
 ### Технологии:
@@ -106,7 +107,18 @@
    docker-compose up -d
    ```
 
-4. (Опционально) Панель управления pgadmin доступна по адресу http://localhost:5050/  
+4. (Опционально) Запуск тестов.  
+
+   Запуск отдельного контейнера с тестовой базой данных:  
+   ```python
+   docker run --name postgres -e POSTGRES_PASSWORD=postgres -p 1111:5432 -d postgres:13.0-alpine  
+   ```   
+   Запуск тестов  
+   ```python
+   pytest
+   ```
+
+5. (Опционально) Панель управления pgadmin доступна по адресу http://localhost:5050/  
     Авторизация:  
     email=pgadmin4@pgadmin.org  
     password=admin  
