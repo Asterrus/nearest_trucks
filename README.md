@@ -136,7 +136,6 @@
    ```
    http://localhost:8000/
    ```
-
 * Документация:
    ```
    http://localhost:8000/docs
